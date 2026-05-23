@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Team — Ecom Ventures</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cabinet+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --lime:#BFFF00;
+  --lime-dim:#8FCC00;
+  --black:#040404;
+  --surface:#0A0A0A;
+  --surface2:#111111;
+  --surface3:#181818;
+  --border:rgba(191,255,0,0.15);
+  --text:#F0F0F0;
+  --muted:#AAAAAA;
+  --font-display:'Bebas Neue',sans-serif;
+  --font-body:'Cabinet Grotesk',sans-serif;
+}
+
+html{scroll-behavior:smooth}
+
+body{
+  background:var(--black);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:1.6;
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* ── CURSOR ── */
+.cursor{position:fixed;width:12px;height:12px;background:var(--lime);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .3s,height .3s;mix-blend-mode:difference}
+.cursor-ring{position:fixed;width:40px;height:40px;border:1px solid var(--lime);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s,opacity .3s;opacity:.5}
+
+/* ── BG LAYERS ── */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;will-change:transform;transform:translateZ(0)}
+.video-bg{position:fixed;inset:0;z-index:0;overflow:hidden}
+.video-bg video{width:100%;height:100%;object-fit:cover;opacity:.25;transform:translate3d(0,0,0)}
+.video-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(4,4,4,.85) 0%,rgba(4,4,4,.6) 40%,rgba(4,4,4,.6) 70%,rgba(4,4,4,.9) 100%)}
+.grid-overlay{position:fixed;inset:0;background-image:linear-gradient(rgba(191,255,0,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(191,255,0,.05) 1px,transparent 1px);background-size:80px 80px;pointer-events:none;z-index:0;transform:translateZ(0)}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9990;opacity:.35}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:22px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(4,4,4,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);transition:padding .3s}
+nav.scrolled{padding:16px 60px}
+.logo{font-family:var(--font-display);font-size:26px;letter-spacing:.04em;color:var(--text);text-decoration:none}
+.logo span{color:var(--lime)}
+nav ul{display:flex;gap:36px;list-style:none}
+nav ul a{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
+nav ul a:hover{color:var(--lime)}
+.nav-cta{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--black);background:var(--lime);padding:11px 26px;text-decoration:none;transition:background .2s,transform .2s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%)}
+.nav-cta:hover{background:#fff;transform:translateY(-2px)}
+.nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
+.nav-hamburger span{display:block;width:24px;height:1.5px;background:var(--lime)}
+.mobile-menu{display:none;position:fixed;inset:0;background:rgba(4,4,4,.97);backdrop-filter:blur(16px);z-index:9000;flex-direction:column;align-items:center;justify-content:center}
+.mobile-menu.open{display:flex}
+.mobile-menu ul{list-style:none;display:flex;flex-direction:column;align-items:center;gap:28px;text-align:center}
+.mobile-menu ul a{font-family:var(--font-display);font-size:44px;letter-spacing:.05em;color:var(--text);text-decoration:none;transition:color .2s}
+.mobile-menu ul a:hover{color:var(--lime)}
+.menu-close{position:absolute;top:28px;right:28px;background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;transition:color .2s}
+.menu-close:hover{color:var(--lime)}
+
+/* ── SECTION BASE ── */
+section{position:relative;z-index:1}
+.reveal{opacity:0;transform:translateY(36px);transition:opacity .7s,transform .7s}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ── SHARED COMPONENTS ── */
+.eyebrow{display:flex;align-items:center;gap:12px;font-size:11px;font-weight:700;letter-spacing:.32em;text-transform:uppercase;color:var(--lime);margin-bottom:18px}
+.eyebrow::before,.eyebrow::after{content:'';width:24px;height:1px;background:var(--lime);flex-shrink:0}
+.eyebrow.left::after{display:none}
+.section-tag{font-size:11px;font-weight:700;letter-spacing:.32em;text-transform:uppercase;color:var(--lime);margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.section-tag::before{content:'';width:20px;height:1px;background:var(--lime)}
+
+/* ══════════════════════════════════════
+   HERO
+══════════════════════════════════════ */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:130px 40px 80px;overflow:hidden}
+.hero-inner{max-width:900px;opacity:0;animation:fadeUp .9s .2s forwards}
+.hero-eyebrow{display:flex;align-items:center;justify-content:center;gap:12px;font-size:11px;font-weight:700;letter-spacing:.32em;text-transform:uppercase;color:var(--lime);margin-bottom:24px}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';width:28px;height:1px;background:var(--lime);flex-shrink:0}
+.hero-h1{font-family:var(--font-display);line-height:.88;letter-spacing:.01em;color:var(--text);margin-bottom:26px}
+.hero-h1 .line1{font-size:clamp(52px,8vw,110px);display:block}
+.hero-h1 .line2{font-size:clamp(72px,13vw,180px);color:var(--lime);display:block;text-shadow:0 0 40px rgba(191,255,0,.3),0 0 80px rgba(191,255,0,.12)}
+.hero-h1 .line3{font-size:clamp(42px,6vw,90px);color:transparent;-webkit-text-stroke:1px rgba(191,255,0,.5);display:block}
+.hero-sub{font-size:clamp(14px,1.8vw,18px);font-weight:500;color:var(--muted);letter-spacing:.1em;max-width:600px;margin:0 auto 44px;line-height:1.8}
+.hero-sub strong{color:var(--text)}
+.hero-scroll{position:absolute;bottom:40px;left:48px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.scroll-line{width:1px;height:55px;background:linear-gradient(to bottom,var(--lime),transparent);animation:scrollPulse 2s infinite}
+.scroll-lbl{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);writing-mode:vertical-rl}
+
+/* ══════════════════════════════════════
+   MARQUEE STRIP
+══════════════════════════════════════ */
+.marquee-strip{border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:18px 0;background:var(--surface);overflow:hidden}
+.marquee-track{display:flex;animation:marquee 22s linear infinite;white-space:nowrap}
+.mq-item{font-family:var(--font-display);font-size:16px;letter-spacing:.1em;color:var(--muted);padding:0 36px;display:flex;align-items:center;gap:36px;flex-shrink:0}
+.mq-dot{width:5px;height:5px;background:var(--lime);border-radius:50%;flex-shrink:0}
+
+/* ══════════════════════════════════════
+   FOUNDERS SECTION
+══════════════════════════════════════ */
+.founders-section{padding:120px 60px}
+.founders-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:72px}
+.founders-title{font-family:var(--font-display);font-size:clamp(52px,7vw,90px);line-height:.92;letter-spacing:.01em;color:var(--text)}
+.founders-title span{color:var(--lime)}
+.founders-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border)}
+
+/* FOUNDER CARD */
+.founder-card{background:var(--surface);padding:0;position:relative;overflow:hidden;transition:background .3s;cursor:default}
+.founder-card:hover{background:var(--surface2)}
+.founder-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--lime);transform:scaleX(0);transform-origin:left;transition:transform .4s}
+.founder-card:hover::before{transform:scaleX(1)}
+.founder-avatar-wrap{position:relative;width:100%;padding-top:100%;overflow:hidden;background:var(--surface2)}
+.founder-avatar-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--surface3) 0%,var(--surface2) 100%)}
+.founder-initials{font-family:var(--font-display);font-size:clamp(48px,6vw,80px);color:rgba(191,255,0,.12);letter-spacing:.05em;transition:color .3s}
+.founder-card:hover .founder-initials{color:rgba(191,255,0,.22)}
+.founder-avatar-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.founder-avatar-icon svg{width:55%;height:55%;opacity:.85}
+.founder-number{position:absolute;bottom:12px;right:16px;font-family:var(--font-display);font-size:48px;color:rgba(191,255,0,.07);line-height:1;pointer-events:none;transition:color .3s}
+.founder-card:hover .founder-number{color:rgba(191,255,0,.13)}
+
+.founder-info{padding:28px 28px 32px}
+.founder-name{font-family:var(--font-display);font-size:28px;letter-spacing:.02em;color:var(--text);line-height:1;margin-bottom:6px}
+.founder-role{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--lime);margin-bottom:16px}
+.founder-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+.tag{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--lime);border:1px solid var(--border);padding:4px 10px;background:rgba(191,255,0,.04);transition:border-color .2s,background .2s}
+.founder-card:hover .tag{border-color:rgba(191,255,0,.3);background:rgba(191,255,0,.07)}
+.founder-bio{font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:22px}
+.founder-socials{display:flex;gap:10px}
+.social-btn{width:34px;height:34px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;text-decoration:none;transition:border-color .2s,background .2s}
+.social-btn:hover{border-color:var(--lime);background:rgba(191,255,0,.08)}
+.social-btn svg{width:15px;height:15px;stroke:var(--muted);fill:none;stroke-width:1.8;transition:stroke .2s}
+.social-btn:hover svg{stroke:var(--lime)}
+
+/* ══════════════════════════════════════
+   OPERATIONS TEAM
+══════════════════════════════════════ */
+.ops-section{padding:120px 60px;background:var(--surface)}
+.ops-header{text-align:center;max-width:700px;margin:0 auto 72px}
+.ops-title{font-family:var(--font-display);font-size:clamp(50px,7vw,88px);line-height:.92;color:var(--text);margin-bottom:16px}
+.ops-title span{color:var(--lime)}
+.ops-sub{font-size:15px;color:var(--muted);line-height:1.8}
+
+.ops-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border)}
+
+.ops-card{background:var(--surface);padding:32px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;transition:background .3s;position:relative;overflow:hidden}
+.ops-card:hover{background:var(--surface2)}
+.ops-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--lime);transform:scaleX(0);transition:transform .4s}
+.ops-card:hover::before{transform:scaleX(1)}
+
+/* AVATAR SVG */
+.avatar-wrap{width:80px;height:80px;border-radius:50%;border:1px solid var(--border);overflow:hidden;margin-bottom:16px;background:var(--surface2);display:flex;align-items:center;justify-content:center;transition:border-color .3s;flex-shrink:0}
+.ops-card:hover .avatar-wrap{border-color:var(--lime)}
+.avatar-wrap svg{width:100%;height:100%}
+
+.ops-name{font-family:var(--font-display);font-size:20px;letter-spacing:.02em;color:var(--text);line-height:1;margin-bottom:6px}
+.ops-role{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--lime)}
+
+/* ══════════════════════════════════════
+   CULTURE / TRUST SECTION
+══════════════════════════════════════ */
+.culture-section{padding:120px 60px}
+.culture-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.culture-left{}
+.culture-title{font-family:var(--font-display);font-size:clamp(50px,7vw,88px);line-height:.92;letter-spacing:.01em;color:var(--text);margin-bottom:28px}
+.culture-title span{color:var(--lime)}
+.culture-desc{font-size:15px;color:var(--muted);line-height:1.9;margin-bottom:36px}
+.culture-pills{display:flex;flex-wrap:wrap;gap:10px}
+.pill{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--black);background:var(--lime);padding:8px 18px}
+
+.culture-right{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
+.culture-card{background:var(--surface);padding:36px 28px;position:relative;overflow:hidden;transition:background .3s}
+.culture-card:hover{background:var(--surface2)}
+.culture-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--lime);transform:scaleX(0);transform-origin:left;transition:transform .4s}
+.culture-card:hover::before{transform:scaleX(1)}
+.culture-icon{width:44px;height:44px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:20px;background:var(--surface2);transition:border-color .3s,background .3s}
+.culture-card:hover .culture-icon{border-color:var(--lime);background:rgba(191,255,0,.08)}
+.culture-icon svg{width:20px;height:20px;stroke:var(--lime);fill:none;stroke-width:1.5}
+.culture-card-title{font-family:var(--font-display);font-size:22px;letter-spacing:.02em;color:var(--text);margin-bottom:10px}
+.culture-card-desc{font-size:13px;color:var(--muted);line-height:1.75}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);margin-top:80px}
+.stat-box{background:var(--surface);padding:44px 36px;transition:background .3s}
+.stat-box:hover{background:var(--surface2)}
+.stat-num{font-family:var(--font-display);font-size:64px;color:var(--lime);line-height:1;display:block;margin-bottom:8px}
+.stat-lbl{font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+
+/* ══════════════════════════════════════
+   CTA SECTION
+══════════════════════════════════════ */
+.cta-section{padding:160px 60px;text-align:center;position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(191,255,0,.05) 0%,transparent 70%);pointer-events:none}
+.cta-eyebrow{font-size:11px;font-weight:700;letter-spacing:.32em;text-transform:uppercase;color:var(--lime);margin-bottom:22px;display:flex;align-items:center;justify-content:center;gap:12px}
+.cta-eyebrow::before,.cta-eyebrow::after{content:'';width:24px;height:1px;background:var(--lime)}
+.cta-title{font-family:var(--font-display);font-size:clamp(58px,10vw,130px);line-height:.88;color:var(--text);margin-bottom:20px}
+.cta-title span{color:var(--lime)}
+.cta-sub{font-size:16px;color:var(--muted);margin-bottom:50px;letter-spacing:.05em}
+.cta-btns{display:flex;gap:22px;justify-content:center;align-items:center;flex-wrap:wrap}
+.btn-primary{display:inline-block;font-family:var(--font-body);font-size:14px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--black);background:var(--lime);padding:18px 46px;text-decoration:none;clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);transition:background .2s,transform .2s}
+.btn-primary:hover{background:#fff;transform:translateY(-3px)}
+.btn-ghost{display:inline-block;font-size:14px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text);text-decoration:none;border-bottom:1px solid var(--border);padding-bottom:4px;transition:color .2s,border-color .2s}
+.btn-ghost:hover{color:var(--lime);border-color:var(--lime)}
+
+/* ══════════════════════════════════════
+   FOOTER
+══════════════════════════════════════ */
+footer{border-top:1px solid var(--border);padding:50px 60px;display:flex;align-items:center;justify-content:space-between;background:var(--surface)}
+.footer-logo{font-family:var(--font-display);font-size:28px;color:var(--text);text-decoration:none}
+.footer-logo span{color:var(--lime)}
+.footer-copy{font-size:12px;color:var(--muted);letter-spacing:.05em}
+.footer-back{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
+.footer-back:hover{color:var(--lime)}
+.footer-back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* ══════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(36px)}to{opacity:1;transform:translateY(0)}}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes scrollPulse{0%,100%{opacity:1;transform:scaleY(1)}50%{opacity:.3;transform:scaleY(.6)}}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes glowPulse{0%,100%{filter:drop-shadow(0 0 4px rgba(191,255,0,.3))}50%{filter:drop-shadow(0 0 12px rgba(191,255,0,.7))}}
+
+/* ══════════════════════════════════════
+   MOBILE
+══════════════════════════════════════ */
+@media(max-width:1100px){
+  .founders-grid{grid-template-columns:1fr 1fr}
+  .ops-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:768px){
+  body{cursor:auto}
+  .cursor,.cursor-ring{display:none}
+  nav{padding:16px 20px}
+  nav ul{display:none}
+  .nav-hamburger{display:flex}
+  .hero{padding:100px 20px 60px;min-height:100svh}
+  .hero-h1 .line1{font-size:clamp(40px,12vw,72px)}
+  .hero-h1 .line2{font-size:clamp(60px,18vw,110px)}
+  .hero-h1 .line3{font-size:clamp(32px,10vw,60px)}
+  .hero-scroll{display:none}
+  .founders-section{padding:70px 20px}
+  .founders-header{flex-direction:column;align-items:flex-start;gap:16px;margin-bottom:44px}
+  .founders-grid{grid-template-columns:1fr}
+  .founder-avatar-wrap{padding-top:70%}
+  .ops-section{padding:70px 20px}
+  .ops-grid{grid-template-columns:repeat(2,1fr)}
+  .culture-section{padding:70px 20px}
+  .culture-inner{grid-template-columns:1fr;gap:48px}
+  .culture-right{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .cta-section{padding:90px 20px}
+  .cta-title{font-size:clamp(52px,14vw,90px)}
+  .cta-btns{flex-direction:column;align-items:center;gap:14px}
+  .btn-primary{width:100%;max-width:340px;text-align:center}
+  footer{flex-direction:column;gap:16px;text-align:center;padding:36px 20px}
+  nav.scrolled{padding:14px 20px}
+}
+@media(max-width:480px){
+  .ops-grid{grid-template-columns:repeat(2,1fr)}
+  .stats-row{grid-template-columns:1fr}
+  .founders-section,.ops-section,.culture-section{padding:56px 16px}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+<div class="grid-overlay"></div>
+<canvas id="bg-canvas"></canvas>
+<div class="video-bg">
+  <video autoplay muted loop playsinline>
+    <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260511_131941_d136af49-e243-493a-be14-6ff3f24e09e6.mp4" type="video/mp4">
+  </video>
+</div>
+
+<!-- NAV -->
+<nav id="main-nav">
+  <a href="index.html" class="logo">ECOM<span>VENTURES</span></a>
+  <ul>
+    <li><a href="index.html#services">Services</a></li>
+    <li><a href="index.html#process">Process</a></li>
+    <li><a href="index.html#results">Results</a></li>
+    <li><a href="team.html" style="color:var(--lime)">Team</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:14px">
+    <a href="audit.html" class="nav-cta">Get Audit</a>
+    <button class="nav-hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <button class="menu-close" id="menu-close">&#10005;</button>
+  <ul>
+    <li><a href="index.html#services">Services</a></li>
+    <li><a href="index.html#process">Process</a></li>
+    <li><a href="index.html#results">Results</a></li>
+    <li><a href="team.html">Team</a></li>
+    <li><a href="audit.html" class="nav-cta" style="display:inline-block;margin-top:8px">Get Audit</a></li>
+  </ul>
+</div>
+
+<!-- ══ SECTION 1: HERO ══ -->
+<section class="hero" id="home">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Real Operators. Real Results.</div>
+    <h1 class="hero-h1">
+      <span class="line1">Built By</span>
+      <span class="line2">REAL</span>
+      <span class="line3">OPERATORS</span>
+    </h1>
+    <p class="hero-sub">
+      <strong>No outsourced work. No random freelancers.</strong> Every brand we scale is handled by a specialist who lives and breathes that exact channel. Meet the people behind Pakistan's fastest-growing ecommerce agency.
+    </p>
+    <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap">
+      <a href="#founders" class="btn-primary">Meet The Team</a>
+      <a href="audit.html" class="btn-ghost">Get Free Audit</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span class="scroll-lbl">Scroll</span>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-strip">
+  <div class="marquee-track">
+    <div class="mq-item"><span class="mq-dot"></span>META ADS</div>
+    <div class="mq-item"><span class="mq-dot"></span>SHOPIFY DEV</div>
+    <div class="mq-item"><span class="mq-dot"></span>CRO</div>
+    <div class="mq-item"><span class="mq-dot"></span>VIDEO EDITING</div>
+    <div class="mq-item"><span class="mq-dot"></span>SEO</div>
+    <div class="mq-item"><span class="mq-dot"></span>AD CREATIVES</div>
+    <div class="mq-item"><span class="mq-dot"></span>BRAND SCALING</div>
+    <div class="mq-item"><span class="mq-dot"></span>CONTENT DIRECTION</div>
+    <div class="mq-item"><span class="mq-dot"></span>META ADS</div>
+    <div class="mq-item"><span class="mq-dot"></span>SHOPIFY DEV</div>
+    <div class="mq-item"><span class="mq-dot"></span>CRO</div>
+    <div class="mq-item"><span class="mq-dot"></span>VIDEO EDITING</div>
+    <div class="mq-item"><span class="mq-dot"></span>SEO</div>
+    <div class="mq-item"><span class="mq-dot"></span>AD CREATIVES</div>
+    <div class="mq-item"><span class="mq-dot"></span>BRAND SCALING</div>
+    <div class="mq-item"><span class="mq-dot"></span>CONTENT DIRECTION</div>
+  </div>
+</div>
+
+<!-- ══ SECTION 2: FOUNDERS ══ -->
+<section class="founders-section" id="founders">
+  <div class="founders-header reveal">
+    <div>
+      <div class="section-tag">Core Team</div>
+      <h2 class="founders-title">THE<br><span>FOUNDERS</span></h2>
+    </div>
+    <p style="max-width:320px;font-size:14px;color:var(--muted);line-height:1.8;margin-bottom:8px">Four specialists. One goal. Every client gets direct access to the expert running their channel.</p>
+  </div>
+
+  <div class="founders-grid">
+
+    <!-- SHOAIB -->
+    <div class="founder-card reveal">
+      <div class="founder-avatar-wrap">
+        <div class="founder-avatar-bg">
+          <span class="founder-initials">SA</span>
+        </div>
+        <div class="founder-avatar-icon">
+          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="60" cy="42" r="22" stroke="rgba(191,255,0,0.6)" stroke-width="1.5"/>
+            <path d="M24 100 C24 78 96 78 96 100" stroke="rgba(191,255,0,0.6)" stroke-width="1.5"/>
+            <circle cx="60" cy="42" r="10" fill="rgba(191,255,0,0.08)" stroke="rgba(191,255,0,0.3)" stroke-width="1"/>
+            <path d="M45 28 L55 24 L65 28" stroke="rgba(191,255,0,0.4)" stroke-width="1" fill="none"/>
+            <!-- growth chart subtle -->
+            <polyline points="34,90 44,80 54,85 64,70 74,75 84,60" stroke="rgba(191,255,0,0.25)" stroke-width="1" fill="none"/>
+          </svg>
+        </div>
+        <span class="founder-number">01</span>
+      </div>
+      <div class="founder-info">
+        <div class="founder-name">Shoaib Ahmed</div>
+        <div class="founder-role">Marketing Strategist &amp; Growth Lead</div>
+        <div class="founder-tags">
+          <span class="tag">Meta Ads</span>
+          <span class="tag">Strategy</span>
+          <span class="tag">Brand Scaling</span>
+          <span class="tag">Ecom Growth</span>
+        </div>
+        <p class="founder-bio">Shoaib architects full-funnel Meta ad systems that turn ad spend into profit. With a deep understanding of Pakistani COD market dynamics, he builds campaigns that consistently outperform benchmarks and scale without ROAS decay.</p>
+        <div class="founder-socials">
+          <a href="#" class="social-btn" target="_blank" rel="noopener" title="LinkedIn">
+            <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="3"/><line x1="7" y1="10" x2="7" y2="17"/><line x1="7" y1="7" x2="7" y2="7.5"/><path d="M11 17v-7m0 3c0-2 6-3 6 0v4"/></svg>
+          </a>
+          <a href="#" class="social-btn" target="_blank" rel="noopener" title="Instagram">
+            <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- KHALID -->
+    <div class="founder-card reveal">
+      <div class="founder-avatar-wrap">
+        <div class="founder-avatar-bg">
+          <span class="founder-initials">KQ</span>
+        </div>
+        <div class="founder-avatar-icon">
+          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="60" cy="42" r="22" stroke="rgba(191,255,0,0.6)" stroke-width="1.5"/>
+            <path d="M24 100 C24 78 96 78 96 100" stroke="rgba(191,255,0,0.6)" stroke-width="1.5"/>
+            <circle cx="60" cy="42" r="10" fill="rgba(191,255,0,0.08)" stroke="rgba(191,255,0,0.3)" stroke-width="1"/>
+            <!-- code brackets -->
+            <text x="30" y="95" font-size="14" fill="rgba(191,255,0,0.3)" font-family="monospace">&lt;/&gt;</text>
+            <rect x="40" y="72" width="40" height="6" rx="1" fill="rgba(191,255,0,0.08)" stroke="rgba(191,255,0,0.2)" stroke-width="1"/>
+            <rect x="44" y="82" width="32" height="4" rx="1" fill="rgba(191,255,0,0.05)" stroke="rgba(191,255,0,0.15)" stroke-width="1"/>
+          </svg>
+        </div>
+        <span class="founder-number">02</span>
+      </div>
+      <div class="founder-info">
+        <div class="founder-name">Khalid Qasmi</div>
+        <div class="founder-role">Shopify Developer &amp; CRO Lead</div>
+        <div class="founder-tags">
+          <span class="tag">Shopify Dev</span>
+          <span class="tag">CRO</span>
+          <span class="tag">Store Optimization</span>
+          <span class="tag">Custom Sections</span>
+        </div>
+        <p class="founder-bio">Khalid engineers Shopify stores built for conversion, not just aesthetics. From custom Liquid sections to full CRO audits using ICE scoring, he finds exactly where stores lose money and fixes it with surgical precision.</p>
+        <div class="founder-socials">
+          <a href="#" class="social-btn" target="_blank" rel="noopener" title="LinkedIn">
+            <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="3"/><line x1="7" y1="10" x2="7" y2="17"/><line x1="7" y1="7" x2="7" y2="7.5"/><path d="M11 17v-7m0 3c0-2 6-3 6 0v4"/></svg>
+          </a>
+          <a href="#" class="social-btn" target="_blank" rel="noopener" title="Instagram">
+            <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- HAMZA -->
+    <div class="founder-card reveal">
+      <div class="founder-avatar-wrap">
+        <div class="founder-avatar-bg">
+          <span class="founder-initials">HA</span>
+        </div>
+        <div class="founder-avatar-icon">
+          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="60" cy="42" r="22" stroke="rgba(191,255,0,0.6)" stroke-width="1.5"/>
+            <path d="M24 100 C24 78 96 78 96 100" stroke="rgba(191,255,0,0.6)" stroke-width="1.5"/>
+            <circle cx="60" cy="42" r="10" fill="rgba(191,255,0,0.08)" stroke="rgba(191,255,0,0.3)" stroke-width="1"/>
+            <!-- camera / play -->
+            <rect x="36" y="74" width="30" height="20" rx="2" stroke="rgba(191,255,0,0.3)" stroke-width="1" fill="rgba(191,255,0,0.05)"/>
+            <path d="M66 79 L80 74 L80 94 L66 89 Z" stroke="rgba(191,255,0,0.3)" stroke-width="1" fill="rgba(191,255,0,0.05)"/>
+            <polygon points="47,80 47,88 54,84" fill="rgba(191,255,0,0.4)"/>
+          </svg>
+        </div>
+        <span class="founder-number">03</span>
+      </div>
+      <div class="founder-info">
+        <div class="founder-name">Hamza Asad</div>
+        <div class="founder-role">Creative Director</div>
+        <div class="founder-tags">
+          <span class="tag">Video Editing</span>
+          <span class="tag">Ad Creatives</span>
+          <span class="tag">Scriptwriting</span>
+          <span class="tag">Content</span>
+        </div>
+        <p class="founder-bio">Hamza directs the creative output that stops the scroll. He scripts, edits, and produces ad creatives built around hook-first psychology and mobile viewing behavior. His work consistently drives sub-₨15 CPMs on Meta.</p>
+        <div class="founder-socials">
+          <a href="#" class="social-btn" target="_blank" rel="noopener" title="LinkedIn">
+            <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="3"/><line x1="7" y1="10" x2="7" y2="17"/><line x1="7" y1="7" x2="7" y2="7.5"/><path d="M11 17v-7m0 3c0-2 6-3 6 0v4"/></svg>
+          </a>
+          <a href="#" class="social-btn" target="_blank" rel="noopener" title="Instagram">
+            <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABDUL REHMAN -->
+    <div class="founder-card reveal">
+      <div class="founder-avatar-wrap">
+        <div class="founder-avatar-bg">
+          <span class="founder-initials">AR</span>
+        </div>
+        <div class="founder-avatar-icon">
+          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="60" cy="42" r="22" stroke="rgba(191,255,0,0.6)" stroke-width="1.5"/>
+            <path d="M24 100 C24 78 96 78 96 100" stroke="rgba(191,255,0,0.6)" stroke-width="1.5"/>
+            <circle cx="60" cy="42" r="10" fill="rgba(191,255,0,0.08)" stroke="rgba(191,255,0,0.3)" stroke-width="1"/>
+            <!-- search / SEO -->
+            <circle cx="51" cy="82" r="10" stroke="rgba(191,255,0,0.3)" stroke-width="1.2" fill="rgba(191,255,0,0.05)"/>
+            <line x1="58" y1="89" x2="68" y2="99" stroke="rgba(191,255,0,0.35)" stroke-width="1.5" stroke-linecap="round"/>
+            <polyline points="40,82 46,78 52,82 58,76 64,80 72,72" stroke="rgba(191,255,0,0.25)" stroke-width="1" fill="none"/>
+          </svg>
+        </div>
+        <span class="founder-number">04</span>
+      </div>
+      <div class="founder-info">
+        <div class="founder-name">Abdul Rehman</div>
+        <div class="founder-role">SEO Specialist</div>
+        <div class="founder-tags">
+          <span class="tag">SEO</span>
+          <span class="tag">Organic Growth</span>
+          <span class="tag">Keyword Strategy</span>
+          <span class="tag">Search Visibility</span>
+        </div>
+        <p class="founder-bio">Abdul builds the organic growth engine that compounds over time. From technical SEO to keyword mapping and content architecture, he makes sure brands own their search real estate and reduce dependence on paid traffic.</p>
+        <div class="founder-socials">
+          <a href="#" class="social-btn" target="_blank" rel="noopener" title="LinkedIn">
+            <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="3"/><line x1="7" y1="10" x2="7" y2="17"/><line x1="7" y1="7" x2="7" y2="7.5"/><path d="M11 17v-7m0 3c0-2 6-3 6 0v4"/></svg>
+          </a>
+          <a href="#" class="social-btn" target="_blank" rel="noopener" title="Instagram">
+            <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ SECTION 3: OPERATIONS TEAM ══ -->
+<section class="ops-section" id="team">
+  <div class="ops-header reveal">
+    <div class="eyebrow" style="justify-content:center">Our Specialists</div>
+    <h2 class="ops-title">THE <span>OPERATIONS</span> TEAM</h2>
+    <p class="ops-sub">Behind every result is a structured team running specific systems. Every client project is handled by dedicated specialists, not generalists.</p>
+  </div>
+
+  <div class="ops-grid" id="ops-grid">
+    <!-- Cards injected by JS -->
+  </div>
+</section>
+
+<!-- ══ SECTION 4: CULTURE / TRUST ══ -->
+<section class="culture-section" id="culture">
+
+  <div class="culture-inner">
+    <div class="culture-left reveal">
+      <div class="section-tag">Why Brands Trust Us</div>
+      <h2 class="culture-title">BUILT LIKE AN<br><span>ECOM OS</span></h2>
+      <p class="culture-desc">We do not run like an agency. We run like an ecommerce operating system. Every department has a dedicated owner. Every decision is data-driven. Every client gets a team that already knows what works in the Pakistani market.</p>
+      <div class="culture-pills">
+        <span class="pill">Transparent Reporting</span>
+        <span class="pill">Real P&amp;L Tracking</span>
+        <span class="pill">COD Market Experts</span>
+        <span class="pill">No Black Box</span>
+        <span class="pill">Daily Accountability</span>
+        <span class="pill">Structured Systems</span>
+      </div>
+    </div>
+    <div class="culture-right reveal">
+      <div class="culture-card">
+        <div class="culture-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <div class="culture-card-title">Data First</div>
+        <p class="culture-card-desc">Every decision at Ecom Ventures is backed by real numbers. ROAS, CPA, return rate, and P&amp;L are tracked daily — not monthly.</p>
+      </div>
+      <div class="culture-card">
+        <div class="culture-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="culture-card-title">Team Ownership</div>
+        <p class="culture-card-desc">No hand-offs. The specialist you meet owns your channel start to finish. Direct communication, full accountability.</p>
+      </div>
+      <div class="culture-card">
+        <div class="culture-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+        <div class="culture-card-title">Structured Systems</div>
+        <p class="culture-card-desc">We run on documented SOPs for every service. Consistent quality, fast execution, zero dependence on one person.</p>
+      </div>
+      <div class="culture-card">
+        <div class="culture-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+        <div class="culture-card-title">Market Expertise</div>
+        <p class="culture-card-desc">We operate exclusively in the Pakistani ecommerce market. COD dynamics, JazzCash flows, and local buyer psychology are our home turf.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-row reveal">
+    <div class="stat-box">
+      <span class="stat-num" data-target="50">0</span>
+      <span class="stat-lbl">Brands Scaled</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-num" data-target="3" data-suffix="X">0</span>
+      <span class="stat-lbl">Average ROAS</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-num" data-target="4">0</span>
+      <span class="stat-lbl">Core Specialists</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-num" data-target="98" data-suffix="%">0</span>
+      <span class="stat-lbl">Client Retention</span>
+    </div>
+  </div>
+
+</section>
+
+<!-- ══ SECTION 5: CTA ══ -->
+<section class="cta-section" id="cta">
+  <div class="cta-eyebrow reveal">Ready to Work With The Team</div>
+  <h2 class="cta-title reveal">LET'S<br><span>SCALE</span><br>TOGETHER</h2>
+  <p class="cta-sub reveal">Book your free audit and get direct access to the specialist who handles your channel.</p>
+  <div class="cta-btns reveal">
+    <a href="audit.html" class="btn-primary">Book Free Audit</a>
+    <a href="index.html#results" class="btn-ghost">See Our Results</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="index.html" class="footer-logo">ECOM<span>VENTURES</span></a>
+  <span class="footer-copy">&copy; 2026 Ecom Ventures. Karachi, Pakistan.</span>
+  <a href="index.html" class="footer-back">
+    <svg viewBox="0 0 14 14"><polyline points="9 3 5 7 9 11"/></svg>
+    Back to Home
+  </a>
+</footer>
+
+<script>
+// VIDEO
+window.addEventListener('load',()=>{const v=document.querySelector('.video-bg video');if(v){v.muted=true;v.playsInline=true;v.play().catch(()=>{})}});
+document.addEventListener('visibilitychange',()=>{const v=document.querySelector('.video-bg video');if(v&&document.visibilityState==='visible')v.play().catch(()=>{})});
+
+// NAV SCROLL
+const nav=document.getElementById('main-nav');
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',window.scrollY>60));
+
+// HAMBURGER
+const hb=document.getElementById('hamburger'),mm=document.getElementById('mobile-menu'),mc=document.getElementById('menu-close');
+if(hb){hb.addEventListener('click',()=>mm.classList.add('open'));mc.addEventListener('click',()=>mm.classList.remove('open'));mm.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>mm.classList.remove('open')));}
+
+// CURSOR
+const cur=document.getElementById('cursor'),rng=document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+(function aR(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;rng.style.left=rx+'px';rng.style.top=ry+'px';requestAnimationFrame(aR);})();
+document.querySelectorAll('a,button,.founder-card,.ops-card,.culture-card').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.width='20px';cur.style.height='20px';rng.style.width='60px';rng.style.height='60px';rng.style.opacity='.8';});
+  el.addEventListener('mouseleave',()=>{cur.style.width='12px';cur.style.height='12px';rng.style.width='40px';rng.style.height='40px';rng.style.opacity='.5';});
+});
+
+// PARTICLES
+const canvas=document.getElementById('bg-canvas'),ctx=canvas.getContext('2d',{alpha:true,desynchronized:true});
+let W,H,pts=[],fc=0;
+function rsz(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+rsz();window.addEventListener('resize',()=>{clearTimeout(rsz._t);rsz._t=setTimeout(rsz,200);});
+class P{constructor(){this.reset(true);}reset(i){this.x=Math.random()*W;this.y=i?Math.random()*H:(Math.random()>.5?-5:H+5);this.vx=(Math.random()-.5)*.25;this.vy=(Math.random()-.5)*.25;this.r=Math.random()*1.4+.4;}update(){this.x+=this.vx;this.y+=this.vy;if(this.x<-10||this.x>W+10||this.y<-10||this.y>H+10)this.reset(false);}}
+for(let i=0;i<55;i++)pts.push(new P());
+const CD=110,CDSQ=CD*CD;
+function drawL(){ctx.beginPath();for(let i=0;i<pts.length;i++){const a=pts[i];for(let j=i+1;j<pts.length;j++){const b=pts[j],dx=a.x-b.x,dy=a.y-b.y;if(dx*dx+dy*dy<CDSQ){ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);}}}ctx.strokeStyle='rgba(191,255,0,0.14)';ctx.lineWidth=.5;ctx.stroke();}
+(function loop(){fc++;ctx.clearRect(0,0,W,H);ctx.fillStyle='rgba(191,255,0,0.7)';ctx.beginPath();for(const p of pts){p.update();ctx.moveTo(p.x+p.r,p.y);ctx.arc(p.x,p.y,p.r,0,Math.PI*2);}ctx.fill();if(fc%2===0)drawL();requestAnimationFrame(loop);})();
+
+// OPERATIONS TEAM DATA
+const team=[
+  {name:'Aisha Khan',role:'Media Buyer',g:'f'},
+  {name:'Bilal Raza',role:'Video Editor',g:'m'},
+  {name:'Sara Malik',role:'Content Assistant',g:'f'},
+  {name:'Usman Ali',role:'Store Manager',g:'m'},
+  {name:'Hina Fatima',role:'CRO Assistant',g:'f'},
+  {name:'Zaid Ahmed',role:'Product Researcher',g:'m'},
+  {name:'Nida Sheikh',role:'Copywriter',g:'f'},
+  {name:'Hassan Mir',role:'SEO Assistant',g:'m'},
+  {name:'Maham Tariq',role:'Designer',g:'f'},
+  {name:'Faisal Noon',role:'Customer Support',g:'m'},
+  {name:'Laiba Noor',role:'Ad Creative Asst',g:'f'},
+  {name:'Omar Siddiq',role:'Analytics Asst',g:'m'},
+];
+
+function avatarSVG(name,g){
+  const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2);
+  const colors=['rgba(191,255,0,0.55)','rgba(191,255,0,0.45)','rgba(191,255,0,0.65)'];
+  const c=colors[name.length%3];
+  // stylized illustrated avatar
+  return `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100" height="100" fill="var(--surface2)"/>
+    <!-- body -->
+    <ellipse cx="50" cy="85" rx="28" ry="18" fill="rgba(191,255,0,0.07)" stroke="${c}" stroke-width="1.2"/>
+    <!-- head -->
+    <circle cx="50" cy="40" r="20" fill="rgba(191,255,0,0.06)" stroke="${c}" stroke-width="1.4"/>
+    <!-- face details -->
+    ${g==='f'?`<path d="M40 36 Q50 30 60 36" stroke="${c}" stroke-width="1" fill="none" opacity=".5"/>
+    <ellipse cx="43" cy="42" rx="3" ry="2" fill="${c}" opacity=".3"/>
+    <ellipse cx="57" cy="42" rx="3" ry="2" fill="${c}" opacity=".3"/>
+    <path d="M45 48 Q50 52 55 48" stroke="${c}" stroke-width="1" fill="none"/>
+    <path d="M36 28 Q38 22 44 22" stroke="${c}" stroke-width="1" fill="none" opacity=".4"/>
+    <path d="M64 28 Q62 22 56 22" stroke="${c}" stroke-width="1" fill="none" opacity=".4"/>`
+    :`<rect x="41" y="36" width="6" height="5" rx="1" fill="${c}" opacity=".3"/>
+    <rect x="53" y="36" width="6" height="5" rx="1" fill="${c}" opacity=".3"/>
+    <path d="M44 48 Q50 51 56 48" stroke="${c}" stroke-width="1.2" fill="none"/>
+    <path d="M38 28 L42 24 L48 26" stroke="${c}" stroke-width="1" fill="none" opacity=".5"/>
+    <path d="M62 28 L58 24 L52 26" stroke="${c}" stroke-width="1" fill="none" opacity=".5"/>`}
+    <!-- initials fallback text -->
+    <text x="50" y="45" text-anchor="middle" dominant-baseline="middle" font-size="14" fill="${c}" font-family="'Bebas Neue',sans-serif" letter-spacing="1" opacity=".0">${initials}</text>
+  </svg>`;
+}
+
+const grid=document.getElementById('ops-grid');
+team.forEach((m,i)=>{
+  const card=document.createElement('div');
+  card.className='ops-card reveal';
+  card.style.transitionDelay=(i*.06)+'s';
+  card.innerHTML=`
+    <div class="avatar-wrap">${avatarSVG(m.name,m.g)}</div>
+    <div class="ops-name">${m.name}</div>
+    <div class="ops-role">${m.role}</div>
+  `;
+  grid.appendChild(card);
+});
+
+// INTERSECTION OBSERVER
+const revealEls=document.querySelectorAll('.reveal');
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});
+},{threshold:.12});
+revealEls.forEach(el=>io.observe(el));
+
+// COUNT UP
+function countUp(el){
+  const target=parseInt(el.dataset.target);
+  const suffix=el.dataset.suffix||'+';
+  let n=0;
+  const step=target/60;
+  const t=setInterval(()=>{n+=step;if(n>=target){n=target;clearInterval(t);}el.textContent=Math.floor(n)+suffix;},18);
+}
+const countIO=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting&&!e.target.dataset.counted){
+      e.target.dataset.counted='1';
+      countUp(e.target);
+    }
+  });
+},{threshold:.5});
+document.querySelectorAll('.stat-num[data-target]').forEach(el=>countIO.observe(el));
+
+// SMOOTH SCROLL
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'});}
+  });
+});
+</script>
+
+<script>
+// Cross-page navigation fix for local file:// protocol
+(function(){
+  function fixLinks(){
+    document.querySelectorAll('a[href]').forEach(function(a){
+      var href = a.getAttribute('href');
+      if(href && (href.endsWith('.html')) && !href.startsWith('http') && !href.startsWith('#') && !href.startsWith('mailto')){
+        a.addEventListener('click', function(e){
+          e.preventDefault();
+          // strip any hash
+          var parts = href.split('#');
+          var page = parts[0];
+          var hash = parts[1] ? '#'+parts[1] : '';
+          // navigate
+          window.location.href = page + hash;
+        });
+      }
+    });
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', fixLinks);
+  } else {
+    fixLinks();
+  }
+})();
+</script>
+</body>
+</html>
