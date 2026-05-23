@@ -44,10 +44,9 @@
     background: var(--lime);
     border-radius: 50%;
     pointer-events: none;
-    z-index: 9999;
+    z-index: 100002;
     transform: translate(-50%, -50%);
-    transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
-    mix-blend-mode: difference;
+    transition: width 0.3s, height 0.3s, background 0.3s;
   }
   .cursor-ring {
     position: fixed;
@@ -55,9 +54,9 @@
     border: 1px solid var(--lime);
     border-radius: 50%;
     pointer-events: none;
-    z-index: 9998;
+    z-index: 100001;
     transform: translate(-50%, -50%);
-    transition: transform 0.15s ease, width 0.3s, height 0.3s, opacity 0.3s;
+    transition: width 0.3s, height 0.3s, opacity 0.3s;
     opacity: 0.5;
   }
   body:hover .cursor { opacity: 1; }
@@ -507,8 +506,9 @@
     position: relative;
     z-index: 1;
     opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.6s, transform 0.6s;
+    transform: translateY(16px);
+    transition: opacity 0.35s ease-out, transform 0.35s ease-out;
+    will-change: opacity, transform;
   }
   .process-step.visible { opacity: 1; transform: translateY(0); }
   .step-num {
@@ -844,8 +844,9 @@
   /* REVEAL ANIMATIONS */
   .reveal {
     opacity: 0;
-    transform: translateY(40px);
-    transition: opacity 0.7s, transform 0.7s;
+    transform: translateY(20px);
+    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+    will-change: opacity, transform;
   }
   .reveal.visible { opacity: 1; transform: translateY(0); }
 
@@ -1263,6 +1264,285 @@
     .nav-hamburger { display: flex; }
   }
 
+
+/* ══════════════════════════════════
+   COOKIE CONSENT BANNER
+══════════════════════════════════ */
+.cookie-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4,4,4,0.7);
+  backdrop-filter: blur(6px);
+  z-index: 99998;
+  opacity: 0;
+  animation: cookieFadeIn 0.5s 0.4s forwards;
+  pointer-events: none;
+}
+@keyframes cookieFadeIn {
+  to { opacity: 1; pointer-events: auto; }
+}
+.cookie-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 99999;
+  background: var(--surface);
+  border-top: 2px solid var(--lime);
+  padding: 28px 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  transform: translateY(100%);
+  animation: cookieSlideUp 0.5s 0.4s cubic-bezier(0.16,1,0.3,1) forwards;
+  box-shadow: 0 -20px 60px rgba(0,0,0,0.6);
+}
+@keyframes cookieSlideUp {
+  to { transform: translateY(0); }
+}
+.cookie-banner.hiding {
+  animation: cookieSlideDown 0.4s cubic-bezier(0.4,0,1,1) forwards;
+}
+.cookie-overlay.hiding {
+  animation: cookieFadeOut 0.4s forwards;
+}
+@keyframes cookieSlideDown {
+  to { transform: translateY(120%); }
+}
+@keyframes cookieFadeOut {
+  to { opacity: 0; pointer-events: none; }
+}
+.cookie-icon {
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--border);
+  background: rgba(191,255,0,0.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.cookie-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: var(--lime);
+  fill: none;
+  stroke-width: 1.5;
+}
+.cookie-text {
+  flex: 1;
+}
+.cookie-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  margin-bottom: 6px;
+  line-height: 1;
+}
+.cookie-title span { color: var(--lime); }
+.cookie-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+  max-width: 600px;
+}
+.cookie-desc a {
+  color: var(--lime);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(191,255,0,0.3);
+}
+.cookie-desc a:hover { border-color: var(--lime); }
+.cookie-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-shrink: 0;
+}
+.cookie-accept {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--black);
+  background: var(--lime);
+  padding: 13px 30px;
+  border: none;
+  cursor: pointer;
+  clip-path: polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+  transition: background 0.2s, transform 0.2s;
+  white-space: nowrap;
+}
+.cookie-accept:hover { background: #fff; transform: translateY(-2px); }
+.cookie-decline {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: none;
+  border: 1px solid var(--border);
+  padding: 12px 22px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+.cookie-decline:hover { color: var(--text); border-color: rgba(255,255,255,0.3); }
+.cookie-settings {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+.cookie-settings:hover { color: var(--lime); }
+
+/* SETTINGS MODAL */
+.cookie-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.cookie-modal.open { opacity: 1; pointer-events: auto; }
+.cookie-modal-bg {
+  position: absolute;
+  inset: 0;
+  background: rgba(4,4,4,0.85);
+  backdrop-filter: blur(8px);
+}
+.cookie-modal-box {
+  position: relative;
+  z-index: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  max-width: 520px;
+  width: 100%;
+  padding: 40px 36px 32px;
+  transform: translateY(20px);
+  transition: transform 0.3s;
+}
+.cookie-modal.open .cookie-modal-box { transform: translateY(0); }
+.cookie-modal-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--lime);
+}
+.cookie-modal-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  letter-spacing: 0.03em;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.cookie-modal-title span { color: var(--lime); }
+.cookie-modal-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+.cookie-toggle-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border);
+}
+.cookie-toggle-row:last-of-type { border-bottom: none; margin-bottom: 28px; }
+.cookie-toggle-info { flex: 1; }
+.cookie-toggle-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+  letter-spacing: 0.04em;
+}
+.cookie-toggle-sub {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+/* TOGGLE SWITCH */
+.toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.25s, border-color 0.25s;
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 16px; height: 16px;
+  background: var(--muted);
+  top: 3px; left: 3px;
+  transition: transform 0.25s, background 0.25s;
+}
+.toggle input:checked + .toggle-slider { background: rgba(191,255,0,0.15); border-color: var(--lime); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(20px); background: var(--lime); }
+.toggle input:disabled + .toggle-slider { opacity: 0.5; cursor: not-allowed; }
+.cookie-modal-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.cookie-modal-close {
+  position: absolute;
+  top: 14px; right: 16px;
+  background: none; border: none;
+  color: var(--muted); font-size: 20px;
+  cursor: pointer; transition: color 0.2s;
+}
+.cookie-modal-close:hover { color: var(--lime); }
+
+/* MOBILE COOKIE */
+@media (max-width: 768px) {
+  .cookie-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 24px 20px 28px;
+    gap: 20px;
+  }
+  .cookie-banner > .cookie-icon { display: none; }
+  .cookie-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .cookie-accept { width: 100%; text-align: center; padding: 15px; }
+  .cookie-decline { width: 100%; text-align: center; }
+  .cookie-settings { width: 100%; text-align: center; padding: 6px 0; }
+  .cookie-modal-box { padding: 32px 20px 24px; }
+  .cookie-modal-footer { flex-direction: column; }
+}
+
 </style>
 </head>
 <body>
@@ -1282,6 +1562,94 @@
 <div class="grid-overlay"></div>
 
 <!-- BG CANVAS -->
+
+<!-- ══ COOKIE OVERLAY ══ -->
+<div class="cookie-overlay" id="cookie-overlay"></div>
+
+<!-- ══ COOKIE BANNER ══ -->
+<div class="cookie-banner" id="cookie-banner">
+  <div class="cookie-icon">
+    <svg viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10"/>
+      <circle cx="8.5" cy="11" r="1.2" fill="rgba(191,255,0,0.5)" stroke="none"/>
+      <circle cx="15" cy="9" r="1" fill="rgba(191,255,0,0.5)" stroke="none"/>
+      <circle cx="13" cy="15" r="1.3" fill="rgba(191,255,0,0.5)" stroke="none"/>
+      <path d="M9 8 C10 6 13 6.5 12.5 9" stroke-width="1.2"/>
+      <path d="M15 13 C17 13 17.5 11 16 10.5" stroke-width="1.2"/>
+    </svg>
+  </div>
+  <div class="cookie-text">
+    <div class="cookie-title">We Use <span>Cookies</span></div>
+    <p class="cookie-desc">
+      We use cookies to enhance your browsing experience, analyse site traffic, and personalise content. By clicking "Accept All", you agree to our use of cookies. You can manage your preferences anytime.
+    </p>
+  </div>
+  <div class="cookie-actions">
+    <button class="cookie-accept" id="cookie-accept">Accept All</button>
+    <button class="cookie-decline" id="cookie-decline">Decline</button>
+    <button class="cookie-settings" id="cookie-settings-btn">Manage Settings</button>
+  </div>
+</div>
+
+<!-- ══ COOKIE SETTINGS MODAL ══ -->
+<div class="cookie-modal" id="cookie-modal">
+  <div class="cookie-modal-bg" id="cookie-modal-bg"></div>
+  <div class="cookie-modal-box">
+    <button class="cookie-modal-close" id="cookie-modal-close">&#10005;</button>
+    <div class="cookie-modal-title">Cookie <span>Settings</span></div>
+    <p class="cookie-modal-desc">Choose which cookies you allow. Essential cookies cannot be disabled as they are required for the site to function.</p>
+
+    <div class="cookie-toggle-row">
+      <div class="cookie-toggle-info">
+        <div class="cookie-toggle-label">Essential Cookies</div>
+        <div class="cookie-toggle-sub">Required for the website to function. Cannot be disabled.</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" checked disabled>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="cookie-toggle-row">
+      <div class="cookie-toggle-info">
+        <div class="cookie-toggle-label">Analytics Cookies</div>
+        <div class="cookie-toggle-sub">Help us understand how visitors interact with the site so we can improve performance and content.</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="toggle-analytics" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="cookie-toggle-row">
+      <div class="cookie-toggle-info">
+        <div class="cookie-toggle-label">Marketing Cookies</div>
+        <div class="cookie-toggle-sub">Used to deliver relevant ads and track campaign performance across platforms like Meta and Google.</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="toggle-marketing" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="cookie-toggle-row">
+      <div class="cookie-toggle-info">
+        <div class="cookie-toggle-label">Preference Cookies</div>
+        <div class="cookie-toggle-sub">Remember your settings and personalise your experience on return visits.</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="toggle-preference" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="cookie-modal-footer">
+      <button class="cookie-decline" id="modal-decline" style="border:1px solid var(--border)">Reject All</button>
+      <button class="cookie-accept" id="modal-save">Save Preferences</button>
+    </div>
+  </div>
+</div>
+
 <canvas id="bg-canvas"></canvas>
 
 <!-- VIDEO BG IN HERO -->
@@ -1869,14 +2237,16 @@
   // INTERSECTION OBSERVER FOR REVEALS
   const revealEls = document.querySelectorAll('.reveal, .process-step');
   const observer = new IntersectionObserver(entries => {
-    entries.forEach((entry, idx) => {
+    entries.forEach((entry) => {
       if (entry.isIntersecting) {
+        const delay = (entry.target.dataset.delay || 0) * 50;
         setTimeout(() => {
           entry.target.classList.add('visible');
-        }, (entry.target.dataset.delay || 0) * 100);
+        }, delay);
+        observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.15 });
+  }, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
   revealEls.forEach((el, i) => {
     if (el.classList.contains('process-step')) el.dataset.delay = i;
     observer.observe(el);
@@ -1971,6 +2341,94 @@
     fixLinks();
   }
 })();
+
+  // ══ COOKIE CONSENT LOGIC ══
+  (function(){
+    var COOKIE_KEY = 'ev_cookie_consent';
+    var EXPIRY_DAYS = 180;
+
+    function setCookie(name, value, days){
+      var d = new Date();
+      d.setTime(d.getTime() + days*24*60*60*1000);
+      document.cookie = name + '=' + JSON.stringify(value) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
+    }
+    function getCookie(name){
+      var c = document.cookie.split(';');
+      for(var i=0;i<c.length;i++){
+        var p = c[i].trim().split('=');
+        if(p[0]===name){ try{ return JSON.parse(decodeURIComponent(p[1])); }catch(e){ return null; } }
+      }
+      return null;
+    }
+
+    var existing = getCookie(COOKIE_KEY);
+    if(existing){ return; } // already consented — skip showing banner
+
+    var banner   = document.getElementById('cookie-banner');
+    var overlay  = document.getElementById('cookie-overlay');
+    var modal    = document.getElementById('cookie-modal');
+
+    function hideBanner(){
+      banner.classList.add('hiding');
+      overlay.classList.add('hiding');
+      setTimeout(function(){
+        banner.style.display = 'none';
+        overlay.style.display = 'none';
+      }, 420);
+    }
+
+    function saveConsent(prefs){
+      setCookie(COOKIE_KEY, prefs, EXPIRY_DAYS);
+      hideBanner();
+      closeModal();
+    }
+
+    // Accept all
+    document.getElementById('cookie-accept').addEventListener('click', function(){
+      saveConsent({ essential:true, analytics:true, marketing:true, preference:true, timestamp: Date.now() });
+    });
+
+    // Decline
+    document.getElementById('cookie-decline').addEventListener('click', function(){
+      saveConsent({ essential:true, analytics:false, marketing:false, preference:false, timestamp: Date.now() });
+    });
+
+    // Open settings
+    document.getElementById('cookie-settings-btn').addEventListener('click', openModal);
+
+    // Modal close
+    document.getElementById('cookie-modal-close').addEventListener('click', closeModal);
+    document.getElementById('cookie-modal-bg').addEventListener('click', closeModal);
+
+    // Reject all from modal
+    document.getElementById('modal-decline').addEventListener('click', function(){
+      document.getElementById('toggle-analytics').checked  = false;
+      document.getElementById('toggle-marketing').checked  = false;
+      document.getElementById('toggle-preference').checked = false;
+      saveConsent({ essential:true, analytics:false, marketing:false, preference:false, timestamp: Date.now() });
+    });
+
+    // Save preferences from modal
+    document.getElementById('modal-save').addEventListener('click', function(){
+      saveConsent({
+        essential:  true,
+        analytics:  document.getElementById('toggle-analytics').checked,
+        marketing:  document.getElementById('toggle-marketing').checked,
+        preference: document.getElementById('toggle-preference').checked,
+        timestamp:  Date.now()
+      });
+    });
+
+    function openModal(){
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal(){
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  })();
+
 </script>
 </body>
 </html>
