@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -384,6 +385,69 @@ input[type="range"]::-moz-range-thumb { width:20px;height:20px;background:var(--
   </div>
 
 </div>
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-analytics.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+const firebaseConfig = {
+    apiKey: "AIzaSyAqml6Zho3lltst2gsBcUvuf7SZAzyZjW8",
+    authDomain: "facebook-b30f5.firebaseapp.com",
+    projectId: "facebook-b30f5",
+    storageBucket: "facebook-b30f5.appspot.com",
+    messagingSenderId: "409371292300",
+    appId: "1:409371292300:web:0f9163753a3140b58c01a9",
+    measurementId: "G-DGJ8YYKELT"
+  };
+
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const db = getFirestore(app);
+
+window.saveToFirebase = async function () {
+
+  const sel = [...document.querySelectorAll('#svc-grid .svc.on')];
+
+  try {
+
+    const docRef = await addDoc(collection(db, "audit_requests"), {
+
+      name: document.getElementById("f-name").value,
+      phone: document.getElementById("f-phone").value,
+      email: document.getElementById("f-email").value,
+      website: document.getElementById("f-url").value,
+      platform: document.getElementById("f-platform").value,
+
+      revenue: document.getElementById("f-revenue").value,
+      roas: document.getElementById("f-roas").value,
+      budget: document.getElementById("bval").innerText,
+      salesChannel: document.getElementById("f-channel").value,
+      challenge: document.getElementById("f-challenge").value,
+
+      services: sel.map(item =>
+        item.querySelector(".svc-lbl").innerText
+      ),
+
+      timeline: document.getElementById("f-timeline").value,
+      extra: document.getElementById("f-extra").value,
+
+      createdAt: new Date()
+
+    });
+
+    console.log("Lead Saved:", docRef.id);
+
+  } catch (error) {
+
+    console.error("Firebase Error:", error);
+
+  }
+
+};
+
+console.log("Firebase Connected");
+
+</script>
 
 <script>
 // VIDEO
@@ -465,6 +529,7 @@ function go(from,to){
 }
 
 function submit(){
+  saveToFirebase();
   const sel=[...document.querySelectorAll('#svc-grid .svc.on')];
   if(!sel.length){document.getElementById('e-svc').style.display='block';document.getElementById('svc-grid').style.outline='1px solid var(--error)';setTimeout(()=>{document.getElementById('svc-grid').style.outline='';},1400);return;}
   const s3=document.getElementById('s3');
