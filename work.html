@@ -1,0 +1,41 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f8f8fb"><meta name="description" content="Explore Ecom Ventures ecommerce projects and case studies across websites, marketing, content, SEO and automation."><title>Work & Case Studies | Ecom Ventures</title><link rel="canonical" href="https://ecom-ventures-studio.vercel.app/work.html"><link rel="stylesheet" href="styles.css"></head><body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="header">
+  <a class="brand" href="index.html" aria-label="Ecom Ventures home"><span class="brand-mark">e<span>v</span></span><span>ecom<span class="brand-sub">ventures</span></span></a>
+  <nav id="nav" aria-label="Main navigation">
+    <a data-nav="home" href="index.html">Home</a>
+    <a data-nav="services" href="services.html">Services</a>
+    <a data-nav="work" href="work.html">Work</a>
+    <a data-nav="results" href="results.html">Results</a>
+    <a data-nav="about" href="about.html">About</a>
+    <a data-nav="contact" class="nav-cta" href="contact.html">Start a project ↗</a>
+  </nav>
+  <button class="menu" aria-label="Open menu" aria-expanded="false" aria-controls="nav">☰</button>
+</header>
+
+<main id="main">
+<header class="page-hero wrap"><p class="eyebrow">PORTFOLIO / CASE STUDIES</p><h1>Project work deserves<br><span class="purple">its own space.</span></h1><p>Published projects load from our portfolio database. Every project opens on a separate case study page with the challenge, work and documented outcome.</p></header>
+<section class="section section-alt"><div class="wrap"><div class="filters" id="work-filters"><button class="active" data-filter="All">All work</button><button data-filter="Websites">Websites</button><button data-filter="Marketing">Marketing</button><button data-filter="Content">Content & social</button><button data-filter="AI & Automation">AI & automation</button></div><div id="portfolio" class="portfolio-grid"><div class="empty-state">Loading published projects...</div></div></div></section>
+<section class="section wrap"><div class="callout"><div><p class="eyebrow">NEED A RELEVANT EXAMPLE?</p><h2>Your category does not need to match ours.</h2></div><div><p>The useful comparison is the business problem, catalog complexity, buying friction, acquisition challenge or content system.</p><a class="button" href="contact.html">Send your brief ↗</a></div></div></section>
+</main>
+
+<footer class="footer wrap">
+  <div class="footer-top">
+    <a class="brand" href="index.html"><span class="brand-mark">e<span>v</span></span><span>ecom<span class="brand-sub">ventures</span></span></a>
+    <p>Build better. Grow with purpose.</p>
+    <div class="footer-links">
+      <a href="https://www.instagram.com/ecomventures.pk/" target="_blank" rel="noopener">Instagram ↗</a>
+      <a href="work.html">Portfolio</a>
+      <a href="results.html">Results</a>
+      <a href="contact.html">Inquiry</a>
+    </div>
+  </div>
+  <div class="footer-bottom"><span>© <span id="year">2026</span> Ecom Ventures</span><span>Karachi, Pakistan. Working beyond borders.</span><a href="privacy.html">Privacy</a></div>
+</footer>
+<script type="module">
+import{initShell,api,projectCard}from'./site.js';initShell('work');
+const el=document.querySelector('#portfolio');let projects=[],active='All';
+function render(){const list=projects.filter(p=>active==='All'||p.category===active);el.innerHTML=list.length?list.map(projectCard).join(''):'<div class="empty-state">No published projects in this category yet.</div>'}
+try{projects=await api('/rest/v1/ev_projects?published=eq.true&select=*&order=sort_order.asc,created_at.desc&limit=100');render()}catch{el.innerHTML='<div class="empty-state">Portfolio is temporarily unavailable.</div>'}
+document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{active=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));render()});
+</script></body></html>
